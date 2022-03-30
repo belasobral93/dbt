@@ -1,5 +1,5 @@
 {# run this with: dbt run-operation check_if_schema_exists #}
-{# next steps for iteration: add this to a post-hook and test in production #}
+{# next steps for iteration: add this to a post-hook and test in production (https://docs.getdbt.com/reference/resource-configs/pre-hook-post-hook) #}
 
 {% macro check_if_schema_exists(db='RAW', generate_cols=True) %}
     {# read schemas from database. #}
