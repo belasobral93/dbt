@@ -13,7 +13,7 @@
         {% do log(myList, true) %}
     {% endfor %}
 
-    {# raise compiler error if current schema is not in list #}
+    {# raise compiler error if current schema is not in list, therefore doesn't exist in database #}
     {% if schema not in myList %}   
         {{ exceptions.raise_compiler_error("schema does not exist. Schema name is " + schema) }}   
     {% endif %} 
