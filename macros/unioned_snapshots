@@ -1,3 +1,5 @@
+-----get snapshots and union them-----
+
 with snowflake_snapshot as (
     select *, 'snowflake' as warehouse
     from {{ref('snowflake_orders_snapshot')}}
@@ -12,11 +14,11 @@ union_snapshots as (
     UNION
     select * from redshift_snapshot
 ),
-
+-----order newly unioned table by unique_key and DBT_VALID_FROM-----
 reorder_snapshots as (
     select * from union_snapshots order by O_ORDERKEY,DBT_VALID_FROM
 ),
-
+-----fill in redshift's latest DBT_VALID_TO with snowflake's earliest DBT_VALID_FROM (by unique_key)-----
 fill_in_date_gaps as (
     select *,
 	LEAD(DBT_VALID_FROM, 1) OVER (
