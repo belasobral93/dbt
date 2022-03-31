@@ -1,0 +1,30 @@
+with snowflake_snapshot as (
+    select *, 'snowflake' as warehouse
+    from {{ref('snowflake_orders_snapshot')}}
+),
+redshift_snapshot as (
+    select *, 'redshift' as warehouse
+    from {{ref('orders_snapshot')}}
+),
+
+union_snapshots as (
+    select * from snowflake_snapshot
+    UNION
+    select * from redshift_snapshot
+),
+
+reorder_snapshots as (
+    select * from union_snapshots order by O_ORDERKEY,DBT_VALID_FROM
+),
+
+fill_in_date_gaps as (
+    select *,
+	LEAD(DBT_VALID_FROM, 1) OVER (
+        PARTITION BY O_ORDERKEY
+		order by DBT_VALID_FROM
+	) as next_date
+    from reorder_snapshots
+)
+
+select *
+from fill_in_date_gaps
